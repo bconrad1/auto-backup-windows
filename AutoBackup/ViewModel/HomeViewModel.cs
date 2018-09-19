@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Forms;
 
 namespace AutoBackup
 {
-    public class Home : INotifyPropertyChanged
+    public class HomeViewModel : ObservableObject, INotifyPropertyChanged
     {
         public string notifyText;
 
@@ -25,12 +22,12 @@ namespace AutoBackup
             set
             {
                 notifyText = value;
-                OnPropertyChanged();
+                OnPropertyChanged("NotifyText");
             }
         }
         public ObservableCollection<FileLocationModel> FileSources { get; } = new ObservableCollection<FileLocationModel>();
 
-        public Home()
+        public HomeViewModel()
         {
             AddFile = new AddFileCommand(this);
             ClearFiles = new ClearFilesCommand(this);
@@ -43,8 +40,8 @@ namespace AutoBackup
 
         class AddFileCommand : ICommand
         {
-            Home parent;
-            public AddFileCommand(Home parent)
+            HomeViewModel parent;
+            public AddFileCommand(HomeViewModel parent)
             {
                 this.parent = parent;
                 parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
@@ -70,7 +67,6 @@ namespace AutoBackup
 
             void getFolderDestinationHandler()
             {
-                Console.WriteLine("OpeningFile");
                 var myDialog = new FolderBrowserDialog();
 
                 if (string.IsNullOrEmpty(parent.CurrentSource))
@@ -85,8 +81,8 @@ namespace AutoBackup
 
         class ClearFilesCommand : ICommand
         {
-            Home parent;
-            public ClearFilesCommand(Home parent)
+            HomeViewModel parent;
+            public ClearFilesCommand(HomeViewModel parent)
             {
                 this.parent = parent;
                 parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
@@ -102,8 +98,8 @@ namespace AutoBackup
 
         class RemoveFileCommand : ICommand
         {
-            Home parent;
-            public RemoveFileCommand(Home parent)
+            HomeViewModel parent;
+            public RemoveFileCommand(HomeViewModel parent)
             {
                 this.parent = parent;
                 parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
@@ -118,15 +114,6 @@ namespace AutoBackup
                 FileSources.Remove(FileSources.Where(i => i.Location == currentFile.Location).First());
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        void OnPropertyChanged([CallerMemberName]string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-
     }
 
 
