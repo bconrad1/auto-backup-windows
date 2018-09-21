@@ -10,9 +10,12 @@ namespace AutoBackup
 {
     public class HomeViewModel : ObservableObject, INotifyPropertyChanged
     {
-        public string notifyText;
-
+  
+        public ObservableCollection<FileLocationModel> FileSources { get; } = new ObservableCollection<FileLocationModel>();
         public string CurrentSource { get; set; }
+        public string CurrentDestination { get; set; }
+
+        public string notifyText;
         public string NotifyText
         {
             get
@@ -25,18 +28,37 @@ namespace AutoBackup
                 OnPropertyChanged("NotifyText");
             }
         }
-        public ObservableCollection<FileLocationModel> FileSources { get; } = new ObservableCollection<FileLocationModel>();
+
+        public string fileDestination = "PLASE ADD A DESTINATION";
+        public string FileDestination
+        {
+            get
+            {
+                return fileDestination;
+            }
+            set
+            {
+                fileDestination = value;
+                OnPropertyChanged("FileDestination");
+            }
+        }
+
 
         public HomeViewModel()
         {
             AddFile = new AddFileCommand(this);
             ClearFiles = new ClearFilesCommand(this);
             RemoveFile = new RemoveFileCommand(this);
+            SetDestination = new SetDestinationCommand(this);
         }
+
+
+        #region Button Commands
 
         public ICommand AddFile { get; private set; }
         public ICommand ClearFiles { get; private set; }
         public ICommand RemoveFile { get; private set; }
+        public ICommand SetDestination { get; private set; }
 
         class AddFileCommand : ICommand
         {
@@ -51,9 +73,11 @@ namespace AutoBackup
             public bool CanExecute(object param) { return true; }
             public void Execute(object param)
             {
-                getFolderDestinationHandler();
-                if (!parent.FileSources.Any(i => i.Location == parent.CurrentSource))
+                string source = getFolderDestinationHandler();
+        
+                if (!parent.FileSources.Any(i => i.Location == parent.CurrentSource) && !String.IsNullOrEmpty(source))
                 {
+                    parent.CurrentSource = source;
                     parent.FileSources.Add(new FileLocationModel(parent.CurrentSource));
                     parent.NotifyText = null;
                 }
@@ -63,20 +87,7 @@ namespace AutoBackup
                     parent.NotifyText = errorText.ToUpper();
                 }
                 parent.CurrentSource = null;
-            }
-
-            void getFolderDestinationHandler()
-            {
-                var myDialog = new FolderBrowserDialog();
-
-                if (string.IsNullOrEmpty(parent.CurrentSource))
-                {
-                    myDialog.ShowDialog();
-                    parent.CurrentSource = myDialog.SelectedPath;
-                }
-
-                return;
-            }
+            }        
         }
 
         class ClearFilesCommand : ICommand
@@ -114,6 +125,46 @@ namespace AutoBackup
                 FileSources.Remove(FileSources.Where(i => i.Location == currentFile.Location).First());
             }
         }
+
+        class SetDestinationCommand : ICommand {
+            HomeViewModel parent;
+            public SetDestinationCommand(HomeViewModel parent)
+            {
+                this.parent = parent;
+                parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
+            }
+
+            public event EventHandler CanExecuteChanged;
+            public bool CanExecute(object param) { return true; }
+            public void Execute(object param)
+            {
+                string destination = getFolderDestinationHandler();
+                if (!String.IsNullOrEmpty(destination))
+                {
+                    parent.CurrentDestination = destination;
+                    parent.FileDestination = parent.CurrentDestination;
+                }
+                else
+                {
+                    parent.CurrentDestination = "THAT IS NOT A VALID DESTINATION";
+                }
+                
+
+            }
+        }
+
+        static protected string getFolderDestinationHandler()
+        {
+            var myDialog = new FolderBrowserDialog();
+            myDialog.ShowDialog();
+            if (!String.IsNullOrEmpty(myDialog.SelectedPath))
+            {        
+                return myDialog.SelectedPath;
+            }
+
+            return String.Empty;
+        }
+        #endregion
     }
 
 

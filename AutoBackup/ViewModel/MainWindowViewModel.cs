@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace AutoBackup
@@ -73,7 +74,7 @@ namespace AutoBackup
 
         public void CloseApplication()
         {
-            System.Windows.Forms.Application.Exit();
+            Application.Current.MainWindow.Close();
         }
         public void MinimizeApplication()
         {
@@ -90,6 +91,7 @@ namespace AutoBackup
                 OnPropertyChanged("WindowState");
             }
         }
+       
     }
 
 }

@@ -44,8 +44,9 @@
     </Window.Resources>
 
     <DockPanel>
-        <UserControl DockPanel.Dock="Top" Height="25" Background="#333">
+        <UserControl DockPanel.Dock="Top" Height="25" Background="#333" x:Name="PART_Title">
             <Grid>
+                <TextBlock Text="AUTO BACKUP" Background="Transparent" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20 0" FontSize="12" FontWeight="DemiBold"/>
                 <Button HorizontalAlignment="Right"                
                 Width="25" Height="25"
                 Content="X" 
