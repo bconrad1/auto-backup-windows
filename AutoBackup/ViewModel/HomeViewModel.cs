@@ -43,117 +43,122 @@ namespace AutoBackup
             }
         }
 
-
+        public HomeViewModel parent;
         public HomeViewModel()
         {
-            AddFile = new AddFileCommand(this);
-            ClearFiles = new ClearFilesCommand(this);
-            RemoveFile = new RemoveFileCommand(this);
-            SetDestination = new SetDestinationCommand(this);
+            parent = this;
         }
 
 
         #region Button Commands
-
-        public ICommand AddFile { get; private set; }
-        public ICommand ClearFiles { get; private set; }
-        public ICommand RemoveFile { get; private set; }
-        public ICommand SetDestination { get; private set; }
-
-        class AddFileCommand : ICommand
+        public ICommand _addFile;
+        public ICommand AddFile
         {
-            HomeViewModel parent;
-            public AddFileCommand(HomeViewModel parent)
+            get
             {
-                this.parent = parent;
-                parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
+                _addFile = new RelayCommand(
+                    param => AddFileCommand(),
+                    param => true);
+                return _addFile;
             }
+        }
+        public void AddFileCommand()
+        {
+            string source = GetFolderDestinationHandler();
 
-            public event EventHandler CanExecuteChanged;
-            public bool CanExecute(object param) { return true; }
-            public void Execute(object param)
+            if (!parent.FileSources.Any(i => i.Location == parent.CurrentSource) && !String.IsNullOrEmpty(source))
             {
-                string source = getFolderDestinationHandler();
-        
-                if (!parent.FileSources.Any(i => i.Location == parent.CurrentSource) && !String.IsNullOrEmpty(source))
-                {
-                    parent.CurrentSource = source;
-                    parent.FileSources.Add(new FileLocationModel(parent.CurrentSource));
-                    parent.NotifyText = null;
-                }
-                else
-                {
-                    string errorText = "That item already exists";
-                    parent.NotifyText = errorText.ToUpper();
-                }
+                parent.CurrentSource = source;
+                parent.FileSources.Add(new FileLocationModel(parent.CurrentSource));
+                parent.NotifyText = null;
+            }
+            else
+            {
+                string errorText = "That item already exists";
+                parent.NotifyText = errorText.ToUpper();
                 parent.CurrentSource = null;
-            }        
+            }
         }
 
-        class ClearFilesCommand : ICommand
+        public ICommand _clearFiles;
+        public ICommand ClearFiles
         {
-            HomeViewModel parent;
-            public ClearFilesCommand(HomeViewModel parent)
+            get
             {
-                this.parent = parent;
-                parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
-            }
-
-            public event EventHandler CanExecuteChanged;
-            public bool CanExecute(object param) { return true; }
-            public void Execute(object param)
-            {
-                parent.FileSources.Clear();
+                _clearFiles = new RelayCommand(
+                    param => ClearFilesCommand(),
+                    param => true
+                    );
+                return _clearFiles;
             }
         }
-
-        class RemoveFileCommand : ICommand
+        public void ClearFilesCommand()
         {
-            HomeViewModel parent;
-            public RemoveFileCommand(HomeViewModel parent)
-            {
-                this.parent = parent;
-                parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
-            }
+            parent.FileSources.Clear();
+            parent.NotifyText = null;
+        }
 
-            public event EventHandler CanExecuteChanged;
-            public bool CanExecute(object param) { return true; }
-            public void Execute(object param)
+        public ICommand _removeFile;
+        public ICommand RemoveFile
+        {
+            get
             {
-                ObservableCollection<FileLocationModel> FileSources = parent.FileSources;
-                FileLocationModel currentFile = (FileLocationModel)param;
-                FileSources.Remove(FileSources.Where(i => i.Location == currentFile.Location).First());
+                _removeFile = new RelayCommand(
+                     param => RemoveFileCommand(param),
+                     param => true);
+                return _removeFile;
+            }
+        }
+        public void RemoveFileCommand(object param)
+        {
+            ObservableCollection<FileLocationModel> FileSources = parent.FileSources;
+            FileLocationModel currentFile = (FileLocationModel)param;
+            FileSources.Remove(FileSources.Where(i => i.Location == currentFile.Location).First());
+        }
+
+        public ICommand _setDestination;
+        public ICommand SetDestination {
+        get
+            {
+                _setDestination = new RelayCommand(
+                    param => SetDestinationCommand(),
+                    param => true
+                    );
+                return _setDestination;
+            }
+        }
+        public void SetDestinationCommand()
+        {
+            string destination = GetFolderDestinationHandler();
+            if (!String.IsNullOrEmpty(destination))
+            {
+                parent.CurrentDestination = destination;
+                parent.FileDestination = parent.CurrentDestination;
+            }
+            else
+            {
+                parent.CurrentDestination = "THAT IS NOT A VALID DESTINATION";
             }
         }
 
-        class SetDestinationCommand : ICommand {
-            HomeViewModel parent;
-            public SetDestinationCommand(HomeViewModel parent)
+        public ICommand _copyFiles;
+        public ICommand CopyFiles
+        {
+            get
             {
-                this.parent = parent;
-                parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
-            }
-
-            public event EventHandler CanExecuteChanged;
-            public bool CanExecute(object param) { return true; }
-            public void Execute(object param)
-            {
-                string destination = getFolderDestinationHandler();
-                if (!String.IsNullOrEmpty(destination))
-                {
-                    parent.CurrentDestination = destination;
-                    parent.FileDestination = parent.CurrentDestination;
-                }
-                else
-                {
-                    parent.CurrentDestination = "THAT IS NOT A VALID DESTINATION";
-                }
-                
-
+                _copyFiles = new RelayCommand(
+                    param => CopyFilesCommand(),
+                    param => parent.FileSources.Count > 0
+                    );
+                return _copyFiles;
             }
         }
+        public void CopyFilesCommand()
+        {
+            return;
+        }
 
-        static protected string getFolderDestinationHandler()
+        static protected string GetFolderDestinationHandler()
         {
             var myDialog = new FolderBrowserDialog();
             myDialog.ShowDialog();

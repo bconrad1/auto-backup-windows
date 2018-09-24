@@ -42,6 +42,41 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="CopyBtnStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="FontSize" Value="10px"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Background" Value="#007f00"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+        				BorderThickness="1"        
+                		BorderBrush="#333" 
+        				CornerRadius="1" 
+        				Background="{TemplateBinding Background}">
+                            <Grid >
+                                <ContentPresenter HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center" Name="content"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="Black" />
+                                <Setter Property="Background" Value="#00e500" />
+                                <Setter Property="Opacity" Value="0.8"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#00cc00" />
+                                <Setter Property="Opacity" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="ColBtnStyle" TargetType="Button">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="FontSize" Value="10px"/>
@@ -95,7 +130,8 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="55"/>
+            <RowDefinition Height="55">
+            </RowDefinition>
             <RowDefinition Height="450"/>
         </Grid.RowDefinitions>
         <Button HorizontalAlignment="Left"                
@@ -103,7 +139,12 @@
                 Width="90" Height="30" 
                 Content="SOURCE" 
                 Style="{StaticResource BtnStyle}"
-                Command="{Binding AddFile}" Margin="15,10,0,0"/>
+                Command="{Binding Path=AddFile}" Margin="15,10,0,0"/>
+        <Button HorizontalAlignment="Left"                
+                VerticalAlignment="Top" 
+                Width="90" Height="30" 
+                Content="COPY" 
+                Style="{StaticResource CopyBtnStyle}" Margin="118,10,0,0"/>
         <Button HorizontalAlignment="Right"                
             VerticalAlignment="Top" 
             Width="90" Height="30" 
@@ -135,17 +176,22 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <TextBlock HorizontalAlignment="Left" 
-                   Margin="118,17,0,0" TextWrapping="Wrap" 
+                   Margin="226,22,0,0" TextWrapping="Wrap" 
                    VerticalAlignment="Top" Height="18" Width="250" 
                    Foreground="Red"
                    Text="{Binding NotifyText}"/>
-        <Button HorizontalAlignment="Left"                
+        <Grid Grid.Row="1">
+            <Button HorizontalAlignment="Left"                
                 VerticalAlignment="Bottom" 
                 Width="90" Height="30" 
                 Content="DESTINATION" 
                 Grid.Row="1"
                 Style="{StaticResource BtnStyle}"
                 Command="{Binding SetDestination}" Margin="15,10,0,0"/>
-        <TextBlock Text="{Binding FileDestination}" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" FontSize="10"/>
+                <TextBlock Text="{Binding FileDestination}" 
+                       Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                       Foreground="White" FontSize="12"/>
+        </Grid>
+    
     </Grid>
 </UserControl>
