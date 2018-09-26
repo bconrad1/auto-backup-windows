@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace AutoBackup
 {
-    public class HomeViewModel : ObservableObject, INotifyPropertyChanged
+    public class HomeViewModel : ObservableObject
     {
   
         public ObservableCollection<FileLocationModel> FileSources { get; } = new ObservableCollection<FileLocationModel>();
@@ -69,7 +69,8 @@ namespace AutoBackup
             if (!parent.FileSources.Any(i => i.Location == parent.CurrentSource) && !String.IsNullOrEmpty(source))
             {
                 parent.CurrentSource = source;
-                parent.FileSources.Add(new FileLocationModel(parent.CurrentSource));
+                FileLocationModel newFolder = (new FileLocationModel(parent.CurrentSource));
+                parent.FileSources.Add(newFolder);
                 parent.NotifyText = null;
             }
             else
@@ -111,6 +112,7 @@ namespace AutoBackup
         }
         public void RemoveFileCommand(object param)
         {
+           
             ObservableCollection<FileLocationModel> FileSources = parent.FileSources;
             FileLocationModel currentFile = (FileLocationModel)param;
             FileSources.Remove(FileSources.Where(i => i.Location == currentFile.Location).First());
@@ -155,7 +157,8 @@ namespace AutoBackup
         }
         public void CopyFilesCommand()
         {
-            return;
+            FileCopier copier = new FileCopier(parent.CurrentDestination, parent.FileSources);
+            copier.CopyFiles();
         }
 
         static protected string GetFolderDestinationHandler()

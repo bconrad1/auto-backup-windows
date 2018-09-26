@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AutoBackup
 {
-    public class FolderLocationModel
+    public class FolderLocationModel : ObservableObject
     {
         public string Location { get; set; }
         private string _displayText;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,12 +9,23 @@ namespace AutoBackup
 {
     public class FileLocationModel : FolderLocationModel
     {
-        public float DownloadProgress { get; set; }
+        private int _downloadProgress;
+        public int DownloadProgress {
+            get
+            {
+                return _downloadProgress;
+            }
+            set
+            {
+                _downloadProgress = value;
+                OnPropertyChanged("DownloadProgress");
+            }
+        }
         public FileLocationModel(string location)
         {
-            this.Location = location;
-            this.DisplayText = location;
-            this.DownloadProgress = 1;
+            Location = location;
+            DisplayText = location;
+            DownloadProgress = 0;
         }
 
       

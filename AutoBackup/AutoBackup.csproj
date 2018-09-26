@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\FileCopier.cs" />
     <Compile Include="Model\FolderLocationModel.cs" />
     <Compile Include="Model\ObservableObject.cs" />
     <Compile Include="Model\FileLocationModel.cs" />
