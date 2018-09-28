@@ -51,9 +51,9 @@ namespace AutoBackup
                     var files = System.IO.Directory.EnumerateFiles(folderLocation, "*", System.IO.SearchOption.AllDirectories);
                     foreach (string file in files)
                     {
-                        File.Copy(file, folderCopyLocation);
-                        float copyPercentage = 1 / fileCount * 100;
-                        folder.DownloadProgress += (int) Math.Floor(copyPercentage);
+                    //    File.Copy(file, folderCopyLocation);
+                    //    float copyPercentage = 1 / fileCount * 100;
+                    //    folder.DownloadProgress += (int) Math.Floor(copyPercentage);
                     }
        
 
