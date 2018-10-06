@@ -30,7 +30,7 @@ namespace AutoBackup
         private string createDisplayText(string location)
         {
             int stringLength = location.Length;
-            int subStringLength = 30;
+            int subStringLength = 50;
             return stringLength > subStringLength ? (location.Substring(0, subStringLength) + "...") : location;
 
         }

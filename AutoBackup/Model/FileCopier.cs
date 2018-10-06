@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,11 @@ namespace AutoBackup
 {
     class FileCopier : ObservableObject
     {
+        enum CopyStatusEnum { unstarted = 1, started = 2, finished = 3, error = 4 };
+
         private string _destination;
-        private ICollection<FileLocationModel>_folders;
-        public FileCopier(string Destination, ICollection<FileLocationModel> Folders) 
+        private ICollection<ZipFileModel>_folders;
+        public FileCopier(string Destination, ICollection<ZipFileModel> Folders) 
         {
             _destination = Destination;
            _folders = Folders;
@@ -39,34 +42,39 @@ namespace AutoBackup
 
         private void MoveFiles(string destination)
         {
-            foreach (FileLocationModel folder in _folders)
+            foreach (ZipFileModel folder in _folders)
             {
                 string folderLocation = folder.Location;
-                string folderLocationStripped = GetFolderName(folderLocation);
+                string folderLocationStripped = GetFolderOrFileName(folderLocation);
                 string folderCopyLocation = System.IO.Path.Combine(destination, folderLocationStripped);
                 try
                 {
-                    System.IO.Directory.CreateDirectory(folderCopyLocation);
-                    int fileCount = getFileCount(folderLocation);
-                    var files = System.IO.Directory.EnumerateFiles(folderLocation, "*", System.IO.SearchOption.AllDirectories);
-                    foreach (string file in files)
+                    string startPath = folderLocation;
+                    string zipPath = folderCopyLocation + ".zip";
+
+                    if (System.IO.File.Exists(zipPath))
                     {
-                    //    File.Copy(file, folderCopyLocation);
-                    //    float copyPercentage = 1 / fileCount * 100;
-                    //    folder.DownloadProgress += (int) Math.Floor(copyPercentage);
+                        File.Delete(zipPath);
+                        ZipFile.CreateFromDirectory(startPath, zipPath);
                     }
-       
+                    else
+                    {
+                        ZipFile.CreateFromDirectory(startPath, zipPath);
+                    }
+
+                    folder.CopyStatus = (int) CopyStatusEnum.finished;
 
                 }
                 catch(Exception ex)
                 {
+                    folder.CopyStatus = (int) CopyStatusEnum.error;
                     Console.WriteLine(ex);
                 }
             
             }
         }
 
-        private string GetFolderName(string folderPath)
+        private string GetFolderOrFileName(string folderPath)
         {
             String[] pathSplit = folderPath.Replace(@"\\", @"\").Split('\\');
             return pathSplit[pathSplit.Length - 1];

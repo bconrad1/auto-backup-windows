@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AutoBackup
 {
-    public class FileLocationModel : FolderLocationModel
+    public class ZipFileModel : FolderLocationModel
     {
         private int _downloadProgress;
         public int DownloadProgress {
@@ -21,7 +21,21 @@ namespace AutoBackup
                 OnPropertyChanged("DownloadProgress");
             }
         }
-        public FileLocationModel(string location)
+
+        private int _copyStatus;
+        public int CopyStatus
+        {
+            get
+            {
+                return (int) _copyStatus;
+            }
+            set
+            {
+                _copyStatus = value;
+                OnPropertyChanged("CopyStatus");
+            }
+        }
+        public ZipFileModel(string location)
         {
             Location = location;
             DisplayText = location;

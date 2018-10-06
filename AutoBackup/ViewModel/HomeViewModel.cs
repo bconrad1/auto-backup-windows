@@ -5,13 +5,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace AutoBackup
 {
     public class HomeViewModel : ObservableObject
     {
   
-        public ObservableCollection<FileLocationModel> FileSources { get; } = new ObservableCollection<FileLocationModel>();
+        public ObservableCollection<ZipFileModel> FileSources { get; } = new ObservableCollection<ZipFileModel>();
         public string CurrentSource { get; set; }
         public string CurrentDestination { get; set; }
 
@@ -65,20 +66,21 @@ namespace AutoBackup
         public void AddFileCommand()
         {
             string source = GetFolderDestinationHandler();
+            parent.CurrentSource = source;
 
             if (!parent.FileSources.Any(i => i.Location == parent.CurrentSource) && !String.IsNullOrEmpty(source))
-            {
-                parent.CurrentSource = source;
-                FileLocationModel newFolder = (new FileLocationModel(parent.CurrentSource));
+            {                
+                ZipFileModel newFolder = (new ZipFileModel(parent.CurrentSource));
                 parent.FileSources.Add(newFolder);
                 parent.NotifyText = null;
             }
             else
             {
-                string errorText = "That item already exists";
+                string errorText = "That item already exists";       
                 parent.NotifyText = errorText.ToUpper();
                 parent.CurrentSource = null;
             }
+    
         }
 
         public ICommand _clearFiles;
@@ -113,8 +115,8 @@ namespace AutoBackup
         public void RemoveFileCommand(object param)
         {
            
-            ObservableCollection<FileLocationModel> FileSources = parent.FileSources;
-            FileLocationModel currentFile = (FileLocationModel)param;
+            ObservableCollection<ZipFileModel> FileSources = parent.FileSources;
+            ZipFileModel currentFile = (ZipFileModel)param;
             FileSources.Remove(FileSources.Where(i => i.Location == currentFile.Location).First());
         }
 
@@ -158,7 +160,9 @@ namespace AutoBackup
         public void CopyFilesCommand()
         {
             FileCopier copier = new FileCopier(parent.CurrentDestination, parent.FileSources);
-            copier.CopyFiles();
+            Thread thread = new Thread(new ThreadStart(copier.CopyFiles));
+            thread.Start();
+       
         }
 
         static protected string GetFolderDestinationHandler()
