@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace AutoBackup
 {
@@ -40,6 +41,20 @@ namespace AutoBackup
             Location = location;
             DisplayText = location;
             DownloadProgress = 0;
+            BrushColor = Brushes.White;
+        }
+        private SolidColorBrush _brushColor;
+        public SolidColorBrush BrushColor
+        {
+            get
+            {
+                return _brushColor;
+            }
+            set
+            {
+                _brushColor = value;
+                OnPropertyChanged("BrushColor");
+            }
         }
 
       

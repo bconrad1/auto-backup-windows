@@ -46,7 +46,7 @@
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="FontSize" Value="10px"/>
             <Setter Property="Margin" Value="10"/>
-            <Setter Property="Background" Value="#007f00"/>
+            <Setter Property="Background" Value="{Binding CanCopyBackground}"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -81,8 +81,8 @@
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="FontSize" Value="10px"/>
             <Setter Property="Margin" Value="0"/>
-            <Setter Property="Background" Value="#666666"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#aaa"/>
+            <Setter Property="Foreground" Value="Black"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
@@ -167,7 +167,7 @@
                     <Border BorderBrush="#888" BorderThickness="0 0 0 1">
                         <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Stretch" x:Name="currentStck">
                             <Ellipse Width="20" Height="20" 
-                                     Fill="White" Stroke="#ddd" 
+                                     Fill="{Binding BrushColor}" Stroke="#ddd" 
                                      Margin="5,0"             
                                      VerticalAlignment="Top"
                                      HorizontalAlignment="Left"/>

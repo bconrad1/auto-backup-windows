@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Threading;
+using System.Windows.Media;
 
 namespace AutoBackup
 {
@@ -16,38 +17,53 @@ namespace AutoBackup
         public string CurrentSource { get; set; }
         public string CurrentDestination { get; set; }
 
-        public string notifyText;
+        private string _notifyText;
         public string NotifyText
         {
             get
             {
-                return notifyText;
+                return _notifyText;
             }
             set
             {
-                notifyText = value;
+                 _notifyText = value;
                 OnPropertyChanged("NotifyText");
             }
         }
 
-        public string fileDestination = "PLASE ADD A DESTINATION";
+        private string _fileDestination = "PLASE ADD A DESTINATION";
         public string FileDestination
         {
             get
             {
-                return fileDestination;
+                return _fileDestination;
             }
             set
             {
-                fileDestination = value;
+                _fileDestination = value;
                 OnPropertyChanged("FileDestination");
             }
         }
 
-        public HomeViewModel parent;
+        private SolidColorBrush _canCopyBackground;
+        public SolidColorBrush CanCopyBackground
+        {
+            get
+            {
+                return _canCopyBackground;
+            }
+            set
+            {
+                _canCopyBackground = value;
+                OnPropertyChanged("CanCopyBackground");
+            }
+        }
+
+        HomeViewModel parent;
         public HomeViewModel()
         {
             parent = this;
+            CanCopyBackground = Brushes.Gray;
         }
 
 
@@ -76,11 +92,20 @@ namespace AutoBackup
             }
             else
             {
-                string errorText = "That item already exists";       
+                string errorText;
+                if (String.IsNullOrEmpty(source))
+                {
+                    errorText = "Please select a folder";
+                }
+                else
+                {
+                    errorText = "That item already exists";
+                }
+                
                 parent.NotifyText = errorText.ToUpper();
                 parent.CurrentSource = null;
             }
-    
+            setCopyBtnBg(parent);
         }
 
         public ICommand _clearFiles;
@@ -99,6 +124,7 @@ namespace AutoBackup
         {
             parent.FileSources.Clear();
             parent.NotifyText = null;
+            setCopyBtnBg(parent);
         }
 
         public ICommand _removeFile;
@@ -118,6 +144,7 @@ namespace AutoBackup
             ObservableCollection<ZipFileModel> FileSources = parent.FileSources;
             ZipFileModel currentFile = (ZipFileModel)param;
             FileSources.Remove(FileSources.Where(i => i.Location == currentFile.Location).First());
+            setCopyBtnBg(parent);
         }
 
         public ICommand _setDestination;
@@ -152,7 +179,7 @@ namespace AutoBackup
             {
                 _copyFiles = new RelayCommand(
                     param => CopyFilesCommand(),
-                    param => parent.FileSources.Count > 0
+                    param => (parent.FileSources.Count > 0 && !String.IsNullOrEmpty(parent.CurrentDestination))
                     );
                 return _copyFiles;
             }
@@ -160,9 +187,16 @@ namespace AutoBackup
         public void CopyFilesCommand()
         {
             FileCopier copier = new FileCopier(parent.CurrentDestination, parent.FileSources);
+
             Thread thread = new Thread(new ThreadStart(copier.CopyFiles));
             thread.Start();
        
+        }
+
+        protected void setCopyBtnBg(HomeViewModel parent)
+        {
+            SolidColorBrush brushColor = FileSources.Count > 0 ? Brushes.Green : Brushes.Gray;
+            parent.CanCopyBackground = brushColor;
         }
 
         static protected string GetFolderDestinationHandler()
