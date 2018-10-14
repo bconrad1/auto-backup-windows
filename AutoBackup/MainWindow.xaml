@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:AutoBackup"
         WindowStyle="None" ResizeMode="NoResize"
         WindowState="{Binding WindowState, Mode=TwoWay}"
-        Title="Auto Backup" Height="600" Width="700" Background="#222">
+        Title="Auto Backup" Height="580" Width="700" Background="#222">
     <Window.Resources>
         <DataTemplate DataType="{x:Type local:HomeViewModel}">
             <local:HomeView/>

@@ -165,6 +165,7 @@ namespace AutoBackup
             {
                 parent.CurrentDestination = destination;
                 parent.FileDestination = parent.CurrentDestination;
+                setCopyBtnBg(parent);
             }
             else
             {
@@ -187,7 +188,6 @@ namespace AutoBackup
         public void CopyFilesCommand()
         {
             FileCopier copier = new FileCopier(parent.CurrentDestination, parent.FileSources);
-
             Thread thread = new Thread(new ThreadStart(copier.CopyFiles));
             thread.Start();
        
@@ -195,7 +195,7 @@ namespace AutoBackup
 
         protected void setCopyBtnBg(HomeViewModel parent)
         {
-            SolidColorBrush brushColor = FileSources.Count > 0 ? Brushes.Green : Brushes.Gray;
+            SolidColorBrush brushColor = (FileSources.Count > 0 && !String.IsNullOrEmpty(parent.CurrentDestination)) ? Brushes.Green : Brushes.Gray;
             parent.CanCopyBackground = brushColor;
         }
 

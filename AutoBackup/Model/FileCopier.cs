@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace AutoBackup
@@ -59,35 +55,29 @@ namespace AutoBackup
             CopyStatus = CopyStatusEnum.started;
             foreach (ZipFileModel folder in _folders)
             {
-                string folderLocation = folder.Location;
-                string folderLocationStripped = GetFolderOrFileName(folderLocation);
-                string folderCopyLocation = System.IO.Path.Combine(destination, folderLocationStripped);
-                string startPath = folderLocation;
-                string zipPath = folderCopyLocation + ".zip";
+                string folderLocationStripped = GetFolderOrFileName(folder.Location);
+                string folderCopyLocation = Path.Combine(destination, folderLocationStripped);
+                string startPath = folder.Location;
+                string zipPath = String.Format("{0}\\{1}.zip",destination, folderLocationStripped);
+                folder.CopyStatus = (int)CopyStatusEnum.started;
                 folder.BrushColor = Brushes.Orange;
 
-                try
-                {                
-                    if (System.IO.File.Exists(zipPath))
+                try {
+                    if (Directory.Exists(destination))
                     {
-                        File.Delete(zipPath);
-                        ZipFile.CreateFromDirectory(startPath, zipPath);
+                        Directory.Delete(destination, true);
                     }
-                    else
-                    {
-                        ZipFile.CreateFromDirectory(startPath, zipPath);
-                    }
+                    ZipFile.CreateFromDirectory(startPath, zipPath);
                     folder.CopyStatus = (int)CopyStatusEnum.finished;
                     folder.BrushColor = Brushes.Green;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    folder.CopyStatus = (int) CopyStatusEnum.error;
+                    folder.CopyStatus = (int)CopyStatusEnum.error;
                     folder.BrushColor = Brushes.Red;
                     Console.WriteLine(ex);
-                }       
+                }    
             }
-            CopyStatus = CopyStatusEnum.finished;
         }
 
         private string GetFolderOrFileName(string folderPath)
@@ -95,26 +85,5 @@ namespace AutoBackup
             String[] pathSplit = folderPath.Replace(@"\\", @"\").Split('\\');
             return pathSplit[pathSplit.Length - 1];
         }
-
-        private int getFileCount(string folderLocation)
-        {
-            int fileCount = 0;
-            try
-            {
-                var files = System.IO.Directory.EnumerateFiles(folderLocation, "*", System.IO.SearchOption.AllDirectories);
-                foreach (string file in files)
-                {
-                    fileCount += 1;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
-            return fileCount;
-        }
-
-
     }
 }
